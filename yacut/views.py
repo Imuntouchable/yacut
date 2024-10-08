@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
 
 from . import app, db
 from .forms import UrlForm
@@ -28,7 +28,7 @@ def index_view():
             db.session.add(new_url)
             db.session.commit()
             flash(url_for(
-                "redirect_to_original",
+                'redirect_to_original',
                 short_id=short_url,
                 _external=True
             )
@@ -38,8 +38,6 @@ def index_view():
 
 @app.route('/<short_id>')
 def redirect_to_original(short_id):
-    url = URLMap.query.filter_by(short=short_id).first()
-    if url:
-        return redirect(url.original)
-    else:
-        abort(404)
+    return redirect(
+        URLMap.query.filter_by(short=short_id).first_or_404().original
+    )
